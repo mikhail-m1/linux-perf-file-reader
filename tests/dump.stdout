@@ -1,0 +1,265 @@
+Info:
+ hostname: zenux
+ os_release: 4.8.0-30-generic
+ tools_version: 4.8.6
+ arch: x86_64
+ cpu_description: Intel(R) Core(TM) i7-5500U CPU @ 2.40GHz
+ total_memory: 8075544
+ command_line: ["/usr/lib/linux-hwe-edge-tools-4.8.0-30/perf", "record", "sleep", "1"]
+ cpu_topology: ["0-3"]
+
+Attrs:
+ EventAttributes { perf_type: Hardware, size: 112, hw_id: CpuCycles, sample_period_or_freq: 4000, sample_format: IP | TID | TIME | PERIOD, read_format: , flags: DISABLED | INHERIT | MMAP | COMM | FREQ | ENABLE_ON_EXEC | TASK | PRECISE_IP1 | PRECISE_IP2 | SAMPLE_ID_ALL | EXCLUDE_GUEST | MMAP2 | COMM_EXEC, wakeup_events_or_watermakr: 0, bp_type: 0, bp_addr_or_config1: 0, bp_len_or_config2: 0, branch_sample_type: 0, sample_regs_user: 0, sample_stack_user: 0, clockid: 0, sample_regs_intr: 0, aux_watermark: 0, sample_max_stack: 0, reserved_2: 0 }
+
+Events:
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffa1e00000, len: 509419520, pgoff: ffffffffa1e00000 - [kernel.kallsyms]_text
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc03d2000, len: 49152, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/net/fjes/fjes.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc03de000, len: 49152, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/mmc/host/sdhci.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc03ea000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/thermal/intel_soc_dts_iosf.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc03ef000, len: 45056, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/acpi/video.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc03fa000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/thermal/int340x_thermal/int340x_thermal_zone.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc03ff000, len: 36864, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/mmc/host/sdhci-acpi.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0408000, len: 36864, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/platform/x86/wmi.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0411000, len: 36864, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/ata/libahci.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc041a000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/thermal/int340x_thermal/processor_thermal_device.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc041f000, len: 372736, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/gpu/drm/drm.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc047a000, len: 45056, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/fs/autofs4/autofs4.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0485000, len: 69632, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/parport/parport.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0496000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/sound/soundcore.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc049b000, len: 40960, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/ata/ahci.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc04a5000, len: 28672, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/char/lp.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc04ac000, len: 28672, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/video/fbdev/core/fb_sys_fops.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc04b3000, len: 139264, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/input/mouse/psmouse.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc04d5000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/video/fbdev/core/sysimgblt.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc04da000, len: 24576, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/char/ppdev.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc04e0000, len: 28672, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/sound/core/seq/snd-seq-midi-event.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc04e7000, len: 28672, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/video/fbdev/core/sysfillrect.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc04ee000, len: 28672, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/video/fbdev/core/syscopyarea.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc04f5000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/i2c/algos/i2c-algo-bit.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc04fa000, len: 36864, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/parport/parport_pc.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0503000, len: 36864, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/macintosh/mac_hid.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc050c000, len: 40960, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/pci/hotplug/shpchp.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0516000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/thermal/int340x_thermal/int3402_thermal.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc051b000, len: 28672, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/sound/core/snd-hwdep.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0522000, len: 172032, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/gpu/drm/drm_kms_helper.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc054c000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/thermal/int340x_thermal/int3406_thermal.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0551000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/i2c/busses/i2c-designware-platform.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0556000, len: 32768, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/acpi/acpi_pad.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc055e000, len: 1318912, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/gpu/drm/i915/i915.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc06a0000, len: 106496, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/misc/mei/mei.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc06ba000, len: 61440, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/misc/mei/mei-me.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc06c9000, len: 69632, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/iio/industrialio.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc06da000, len: 36864, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/sound/core/snd-rawmidi.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc06e3000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/thermal/int340x_thermal/acpi_thermal_rel.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc06e8000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/iio/buffer/kfifo_buf.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc06ed000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/platform/x86/asus-wireless.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc06f2000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/iio/light/acpi-als.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc06f7000, len: 32768, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/thermal/int340x_thermal/int3400_thermal.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc06ff000, len: 90112, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/sound/core/snd.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0715000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/input/serio/serio_raw.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc071a000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/sound/core/seq/snd-seq-midi.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc071f000, len: 40960, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/i2c/busses/i2c-designware-core.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0729000, len: 45056, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/spi/spi-pxa2xx-platform.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0734000, len: 36864, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/tty/serial/8250/8250_dw.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc073d000, len: 40960, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/sound/core/snd-timer.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0747000, len: 28672, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/sound/soc/intel/common/snd-soc-sst-match.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc074e000, len: 32768, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/sound/soc/intel/common/snd-soc-sst-acpi.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0756000, len: 40960, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/dma/dw/dw_dmac_core.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0760000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/sound/core/seq/snd-seq-device.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0765000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/arch/x86/events/intel/intel-rapl-perf.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc076a000, len: 32768, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/hwmon/coretemp.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0772000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/dma/dw/dw_dmac.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0777000, len: 73728, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/sound/core/seq/snd-seq.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0789000, len: 114688, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/sound/core/snd-pcm.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc07a5000, len: 49152, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/sound/pci/hda/snd-hda-intel.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc07b1000, len: 90112, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/sound/hda/snd-hda-core.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc07c7000, len: 28672, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/input/input-leds.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc07ce000, len: 28672, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/sound/pci/hda/snd-hda-codec-conexant.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc07d5000, len: 40960, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/input/joydev.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc07df000, len: 36864, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/mfd/lpc_ich.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc07e8000, len: 139264, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/sound/pci/hda/snd-hda-codec.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc080a000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/arch/x86/events/intel/intel-cstate.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc080f000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/arch/x86/crypto/glue_helper.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0814000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/crypto/arc4.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0819000, len: 28672, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/crypto/cryptd.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0820000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/thermal/intel_pch_thermal.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0825000, len: 77824, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/sound/pci/hda/snd-hda-codec-generic.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0838000, len: 53248, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/sound/pci/hda/snd-hda-codec-hdmi.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0845000, len: 585728, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/net/wireless/cfg80211.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc08d4000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/input/sparse-keymap.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc08d9000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/crypto/ablk_helper.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc08de000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/arch/x86/crypto/ghash-clmulni-intel.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc08e3000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/crypto/lrw.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc08e8000, len: 24576, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/arch/x86/crypto/aes-x86_64.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc08ee000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/virt/lib/irqbypass.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc08f3000, len: 40960, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/platform/x86/asus-wmi.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc08fd000, len: 253952, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/arch/x86/crypto/crc32-pclmul.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc093b000, len: 172032, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/arch/x86/crypto/aesni-intel.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0965000, len: 765952, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/net/mac80211/mac80211.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0a20000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/thermal/x86_pkg_temp_thermal.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0a25000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/fs/nls/nls_iso8859-1.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0a2a000, len: 24576, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/powercap/intel_rapl.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0a30000, len: 28672, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/platform/x86/asus-nb-wmi.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0a37000, len: 45056, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/media/media.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0a42000, len: 24576, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/media/v4l2-core/videobuf2-memops.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0a48000, len: 28672, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/bluetooth/btintel.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0a4f000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/arch/x86/crypto/crct10dif-pclmul.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0a54000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/bluetooth/btbcm.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0a59000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/bluetooth/btrtl.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0a5e000, len: 364544, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/net/wireless/intel/iwlwifi/iwlwifi.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0ab7000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/media/v4l2-core/videobuf2-vmalloc.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0abc000, len: 49152, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/bluetooth/btusb.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0ac8000, len: 602112, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/arch/x86/kvm/kvm.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0b5b000, len: 565248, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/net/bluetooth/bluetooth.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0be5000, len: 28672, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/media/v4l2-core/videobuf2-v4l2.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0bec000, len: 94208, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/media/usb/uvc/uvcvideo.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0c03000, len: 24576, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/net/bluetooth/bnep/bnep.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0c09000, len: 184320, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/media/v4l2-core/videodev.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0c36000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/arch/x86/kernel/msr.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0c3b000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/char/nvram.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0c40000, len: 24576, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/crypto/ccm.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0c46000, len: 45056, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/media/v4l2-core/videobuf2-core.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0c51000, len: 81920, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/net/bluetooth/rfcomm/rfcomm.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0c65000, len: 20480, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/crypto/cmac.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0c6a000, len: 118784, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/usb/storage/usb-storage.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0c87000, len: 28672, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/usb/storage/uas.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0c8e000, len: 1089536, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/drivers/net/wireless/intel/iwlwifi/mvm/iwlmvm.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Mmap: pid: 4294967295, tid: 0, addr: ffffffffc0d98000, len: 1059487743, pgoff: 0 - /lib/modules/4.8.0-30-generic/kernel/arch/x86/kvm/kvm-intel.ko
+  Sample: pid: 0 tid: 0 time: 0
+ Comm: pid: 19321, tid:19321, comm: perf
+  Sample: pid: 0 tid: 0 time: 0
+ Sample: ip: ffffffffa1f8784c pid: 19321 tid: 19321 time: 28243780506164 period: 1
+ Sample: ip: ffffffffa1e0d664 pid: 19321 tid: 19321 time: 28243780509236 period: 1
+ Sample: ip: ffffffffa1e36f43 pid: 19321 tid: 19321 time: 28243780510762 period: 10
+ Sample: ip: ffffffffa1e36f43 pid: 19321 tid: 19321 time: 28243780512222 period: 208
+ Sample: ip: ffffffffa1e37039 pid: 19321 tid: 19321 time: 28243780513711 period: 4641
+ Comm: pid: 19321, tid:19321, comm: sleep
+  Sample: pid: 19321 tid: 19321 time: 28243780514767
+ Sample: ip: ffffffffa203a817 pid: 19321 tid: 19321 time: 28243780516105 period: 101267
+ Mmap2: pid: 19321, tid: 19321, addr: 400000, len: 28672, pgoff: 0 - /bin/sleep
+   dev: 8:5 inode: 12058743, inode generation: 3518563414, prot: 5, flags: 6146
+  Sample: pid: 19321 tid: 19321 time: 28243780524408
+ Mmap2: pid: 19321, tid: 19321, addr: 7f5e50d32000, len: 2260992, pgoff: 0 - /lib/x86_64-linux-gnu/ld-2.23.so
+   dev: 8:5 inode: 5117017, inode generation: 3481120611, prot: 5, flags: 6146
+  Sample: pid: 19321 tid: 19321 time: 28243780532305
+ Mmap2: pid: 19321, tid: 19321, addr: 7ffe6ff5f000, len: 8192, pgoff: 0 - [vdso]
+   dev: 0:0 inode: 0, inode generation: 0, prot: 0, flags: 0
+  Sample: pid: 19321 tid: 19321 time: 28243780543252
+ Sample: ip: ffffffffa222c6c0 pid: 19321 tid: 19321 time: 28243780552396 period: 1413261
+ Mmap2: pid: 19321, tid: 19321, addr: 7f5e50969000, len: 3969024, pgoff: 0 - /lib/x86_64-linux-gnu/libc-2.23.so
+   dev: 8:5 inode: 5118780, inode generation: 3481120622, prot: 5, flags: 4098
+  Sample: pid: 19321 tid: 19321 time: 28243780607396
+ Exit: pid: 19321, ppid: 19321, tid:19321, ptid: 19321, time: 28244781002998
+  Sample: pid: 19321 tid: 19321 time: 28244781002721

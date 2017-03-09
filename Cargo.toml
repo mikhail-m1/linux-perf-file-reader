@@ -1,0 +1,13 @@
+[package]
+name = "linux-perf-file-reader"
+version = "0.1.0"
+authors = ["Mikhail Modin <mikhailm1@gmail.com>"]
+
+[dependencies]
+bitflags = "*"
+error-chain = "*"
+log = "0.3"
+
+
+[dev-dependencies]
+env_logger ="*"
