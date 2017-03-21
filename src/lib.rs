@@ -12,9 +12,15 @@ use std::io::{Read, Seek};
 
 mod errors {
     error_chain! { 
-        errors {
-            IOError
+        foreign_links {
+            IOError(::std::io::Error);
         }
+
+        errors {
+            InvalidSinature {
+                description("invalid perf file signature")
+                display("invalid perf file signature")
+        } }
     }
 }
 
@@ -54,6 +60,8 @@ mod header_flags {
 }
 
 use header_flags::HeaderFlags;
+
+const PERF_FILE_SIGNATURE: u64 = 0x32454c4946524550;
 
 #[repr(C)]
 #[derive(Debug)]
@@ -548,68 +556,82 @@ fn read_info(file: &mut File, header: &PerfHeader) -> io::Result<(Info)> {
         arch: arch, cpu_id: cpu_id, cpu_description: cpu_description, total_memory: total_memory, command_line: command_line, cpu_topology: cpu_topology}));
 }
 
-pub fn read_perf_file<P: std::convert::AsRef<std::path::Path>>(path: P) -> Result<(Perf)> {
-    let mut file = File::open(path).chain_err(|| ErrorKind::IOError)?;
-    let header = read_raw::<PerfHeader>(&mut file).chain_err(|| ErrorKind::IOError)?;
-    let info = read_info(&mut file, &header).chain_err(|| ErrorKind::IOError)?;
+pub fn is_perf_file<P: std::convert::AsRef<std::path::Path>>(path: &P) -> Result<(bool)> {
+    let metadata = std::fs::metadata(path)?;
+    if metadata.len() <  mem::size_of::<PerfHeader>() as u64 {
+        return Ok(false);
+    }
+    let mut file = File::open(&path)?;
+    let header = read_raw::<PerfHeader>(&mut file)?;
+    Ok(header.magic == PERF_FILE_SIGNATURE)
+}
+
+pub fn read_perf_file<P: std::convert::AsRef<std::path::Path>>(path: &P) -> Result<(Perf)> {
+    let mut file = File::open(path)?;
+    let header = read_raw::<PerfHeader>(&mut file)?;
+    if header.magic != PERF_FILE_SIGNATURE {
+        return Err(ErrorKind::InvalidSinature.into());
+    }
+    let info = read_info(&mut file, &header)?;
         
     let attrs = (0..(header.attrs.size / header.attr_size)).map(|i| {
-        file.seek(io::SeekFrom::Start(header.attrs.offset + i * header.attr_size)).chain_err(|| ErrorKind::IOError)?;
-        read_raw::<EventAttributes>(&mut file).chain_err(|| ErrorKind::IOError)
+        file.seek(io::SeekFrom::Start(header.attrs.offset + i * header.attr_size))?;
+        let attr = read_raw::<EventAttributes>(&mut file)?;
+        Ok(attr)
     }).collect::<Result<Vec<_>>>()?;
     
     let sample_format = attrs[0].sample_format;
     let sample_size = sample_id_size(&sample_format);
         
     let mut events = Vec::new();
-    let mut position = file.seek(io::SeekFrom::Start(header.data.offset)).chain_err(|| ErrorKind::IOError)?;
+    let mut position = file.seek(io::SeekFrom::Start(header.data.offset))?;
     let mut size = 0;
     while size < header.data.size {
-        let event_header = read_raw::<EventHeader>(&mut file).chain_err(|| ErrorKind::IOError)?;
+        let event_header = read_raw::<EventHeader>(&mut file)?;
         debug!("{:x} {:?}", position, event_header);
 
         match event_header.record_type {
             RecordType::MMap => {
-                let part = read_raw::<MMapPart>(&mut file).chain_err(|| ErrorKind::IOError)?;
+                let part = read_raw::<MMapPart>(&mut file)?;
                 let filename = read_string(&mut file, event_header.size as usize - 
                             mem::size_of::<MMapPart>() - 
                             mem::size_of::<EventHeader>() -
-                            sample_size).chain_err(|| ErrorKind::IOError)?;
-                let s = read_sample_id(&mut file, &sample_format).chain_err(|| ErrorKind::IOError)?;
+                            sample_size)?;
+                let s = read_sample_id(&mut file, &sample_format)?;
                 events.push(Event::MMap{pid: part.pid, tid: part.tid, addr:part.addr, pgoff: part.pgoff, len: part.len, filename: filename, sample_id: s});
             },
             RecordType::Sample => {
-                events.push(read_sample(&mut file, &sample_format).chain_err(|| ErrorKind::IOError)?);
+                events.push(read_sample(&mut file, &sample_format)?);
             },
             RecordType::MMap2 => {
-                let part = read_raw::<MMap2Part>(&mut file).chain_err(|| ErrorKind::IOError)?;
+                let part = read_raw::<MMap2Part>(&mut file)?;
                 let filename = read_string(&mut file, event_header.size as usize - 
                             mem::size_of::<MMap2Part>() - 
                             mem::size_of::<EventHeader>() -
-                            sample_size).chain_err(|| ErrorKind::IOError)?;
-                let s = read_sample_id(&mut file, &sample_format).chain_err(|| ErrorKind::IOError)?;
+                            sample_size)?;
+                let s = read_sample_id(&mut file, &sample_format)?;
                 events.push(Event::MMap2{pid: part.pid, tid: part.tid, addr:part.addr, pgoff: part.pgoff, len: part.len, 
                     maj: part.maj, min: part.min, ino: part.ino, ino_generation: part.ino_generation, prot: part.prot, flags: part.flags, filename: filename, sample_id: s});
             },
             RecordType::Exit => {
-                let part = read_raw::<ExitPart>(&mut file).chain_err(|| ErrorKind::IOError)?;
-                let s = read_sample_id(&mut file, &sample_format).chain_err(|| ErrorKind::IOError)?;
+                let part = read_raw::<ExitPart>(&mut file)?;
+                let s = read_sample_id(&mut file, &sample_format)?;
                 events.push(Event::Exit{pid: part.pid, ppid: part.ppid, tid: part.tid, ptid: part.ptid, time: part.time, sample_id: s});
             },
             RecordType::Comm => {
-                let part = read_raw::<CommPart>(&mut file).chain_err(|| ErrorKind::IOError)?;
+                let part = read_raw::<CommPart>(&mut file)?;
                 let comm = read_string(&mut file, event_header.size as usize - 
                             mem::size_of::<CommPart>() - 
                             mem::size_of::<EventHeader>() -
-                            sample_size).chain_err(|| ErrorKind::IOError)?;
-                let s = read_sample_id(&mut file, &sample_format).chain_err(|| ErrorKind::IOError)?;
+                            sample_size)?;
+                let s = read_sample_id(&mut file, &sample_format)?;
                 events.push(Event::Comm{pid: part.pid, tid: part.tid, comm: comm, sample_id: s});
             },
             RecordType::FinishedRound => events.push(Event::FinishedRound),
             _ => events.push(Event::Unsupported),
         }
         size += event_header.size as u64;
-        position = file.seek(io::SeekFrom::Start(header.data.offset + size)).chain_err(|| ErrorKind::IOError)?;
+        position = file.seek(io::SeekFrom::Start(header.data.offset + size))?;
     }
     Ok(Perf{info: info, event_attributes: attrs, events: events})
 }
