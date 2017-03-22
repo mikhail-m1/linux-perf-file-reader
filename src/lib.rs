@@ -566,6 +566,15 @@ pub fn is_perf_file<P: std::convert::AsRef<std::path::Path>>(path: &P) -> Result
     Ok(header.magic == PERF_FILE_SIGNATURE)
 }
 
+pub fn read_perf_file_info<P: std::convert::AsRef<std::path::Path>>(path: &P) -> Result<(Info)> {
+    let mut file = File::open(path)?;
+    let header = read_raw::<PerfHeader>(&mut file)?;
+    if header.magic != PERF_FILE_SIGNATURE {
+        return Err(ErrorKind::InvalidSinature.into());
+    }
+    Ok(read_info(&mut file, &header)?)
+}
+
 pub fn read_perf_file<P: std::convert::AsRef<std::path::Path>>(path: &P) -> Result<(Perf)> {
     let mut file = File::open(path)?;
     let header = read_raw::<PerfHeader>(&mut file)?;
