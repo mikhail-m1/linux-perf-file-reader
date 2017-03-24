@@ -5,6 +5,8 @@ extern crate error_chain;
 extern crate log;
 #[macro_use] 
 extern crate bitflags;
+#[macro_use]
+extern crate serde_derive;
 
 use std::fs::File;
 use std::{mem, slice, io};
@@ -25,6 +27,9 @@ mod errors {
 }
 
 use errors::*;
+
+pub use errors::Error;
+pub use errors::ErrorKind;
 
 #[repr(C)]
 #[derive(Debug)]
@@ -306,7 +311,7 @@ struct CommPart {
     tid: u32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Info {
     pub hostname: Option<String>,
     pub os_release: Option<String>,
