@@ -35,7 +35,12 @@ fn main() {
         Ok(ref perf) => {
             println!("Info:");
             print_if_some_child!(" {}: {}\n", perf.info, hostname, os_release, tools_version, arch, cpu_description, cpu_id, total_memory);
-            print_if_some_child!(" {}: {:?}\n", perf.info, command_line, cpu_topology); 
+            print_if_some_child!(" {}: {:?}\n", perf.info, command_line, cpu_topology, cpu_count);
+            if let Some(ref event_description) = perf.info.event_description {
+                for d in event_description {
+                    print!(" event_attribute {}{:?}: {:?}", d.name, d.ids, d.attributes);
+                }
+            }
             println!("\nAttrs:");
             for attr in perf.event_attributes.iter() {
                 println!(" {:?}", attr);

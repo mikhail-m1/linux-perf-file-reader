@@ -82,7 +82,7 @@ struct PerfHeader {
 }
 
 #[repr(u32)]
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 #[allow(dead_code)]
 pub enum PerfType {
     Hardware		= 0,
@@ -94,7 +94,7 @@ pub enum PerfType {
 }
 
 #[repr(u64)]
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 #[allow(dead_code)]
 pub enum HwId {
     CpuCycles		        = 0,
@@ -111,6 +111,7 @@ pub enum HwId {
 
 pub mod attr_flags {
     bitflags! {
+        #[derive(Serialize)]
         pub flags AttrFlags: u64 {
             const DISABLED          = 1, /* off by default        */
             const INHERIT           = 1 << 1, /* children inherit it   */
@@ -154,6 +155,7 @@ pub mod attr_flags {
 
 pub mod sample_format {
     bitflags!{
+        #[derive(Serialize)]
         pub flags SampleFormat: u64 {
             const IP	    	= 1 << 0,
             const TID			= 1 << 1,
@@ -180,6 +182,7 @@ pub mod sample_format {
 
 pub mod read_format {
     bitflags!{
+        #[derive(Serialize)]
         pub flags ReadFormat: u64 {
             const TOTAL_TIME_ENABLED    = 1 << 0,
             const TOTAL_TIME_RUNNING	= 1 << 1,
@@ -190,7 +193,7 @@ pub mod read_format {
 }
 
 #[repr(C)]
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct EventAttributes {
 	pub perf_type: PerfType, //Major type: hardware/software/tracepoint/etc.
 	pub size: u32,
@@ -317,11 +320,13 @@ pub struct Info {
     pub os_release: Option<String>,
     pub tools_version: Option<String>,
     pub arch: Option<String>,
+    pub cpu_count: Option<CpuCount>,
     pub cpu_description: Option<String>,
     pub cpu_id: Option<String>,
     pub total_memory: Option<u64>,
     pub command_line: Option<Vec<String>>,
     pub cpu_topology: Option<Vec<String>>,
+    pub event_description: Option<Vec<EventDescription>>,
     // TODO add others
 }
 
@@ -390,6 +395,8 @@ pub struct Perf {
     pub info: Info,
     pub event_attributes: Vec<EventAttributes>,
     pub events: Vec<Event>,
+    pub start: u64,
+    pub end: u64
 }
 
 fn read_raw<T>(file: &mut Read) -> io::Result<T> {
@@ -465,27 +472,43 @@ struct HeaderInfoReader<'a> {
     flags: HeaderFlags
 }
 
+fn collect_n<T,E,F>(count: usize, mut function: F) -> std::result::Result<Vec<T>, E> where F:FnMut() -> std::result::Result<T, E> {
+    let mut v = Vec::with_capacity(count);
+    for _ in 0..count {
+        v.push(function()?);
+    }
+    Ok(v)
+}
+
+fn bits_count(mut v: u64) -> u8 {
+    let mut c = 0;
+    while v != 0 {
+        v &= v - 1;
+        c += 1;
+    }
+    c
+}
+
 impl<'a> HeaderInfoReader<'a> {
     fn new(file: &'a mut File, header: &PerfHeader) -> io::Result<Self> {
         file.seek(io::SeekFrom::Start(header.data.offset + header.data.size))?;
-        let mut sections = Vec::new();
-        loop {
-            let section = read_raw::<PerfFileSection>(file)?;
-            if section.offset == 0 {
-                break;
-            }
-            sections.push(section);
-
-        }
+        let sections = collect_n(bits_count(header.flags.bits()) as usize, || read_raw::<PerfFileSection>(file))?;
+        debug!("have {} info records, start at 0x{:x}", sections.len(), header.data.offset + header.data.size);
         Ok(HeaderInfoReader{ file: file, sections: sections, current: 0, flags: header.flags })
     }
 
+    fn seek(&mut self) -> io::Result<()> {
+        let section = &self.sections[self.current];
+        debug!("Read section {}, size {}", self.current, section.size);
+        self.file.seek(io::SeekFrom::Start(section.offset))?;
+        self.current += 1;
+        Ok(())
+    }
+ 
     fn get_string(&mut self, flag: HeaderFlags) -> io::Result<Option<String>> {
         if self.flags.contains(flag) && self.sections.len() > self.current {
-            let section = &self.sections[self.current];
-            self.file.seek(io::SeekFrom::Start(section.offset))?;
+            self.seek()?;
             let size = read_raw::<u32>(self.file)?;
-            self.current += 1;
             Ok(Some(read_string(self.file, size as usize)?))
         } else {
             Ok(None)
@@ -494,16 +517,33 @@ impl<'a> HeaderInfoReader<'a> {
 
     fn get_string_array(&mut self, flag: HeaderFlags) -> io::Result<Option<Vec<String>>> {
         if self.flags.contains(flag) && self.sections.len() > self.current {
-            let section = &self.sections[self.current];
-            self.file.seek(io::SeekFrom::Start(section.offset))?;
-            let count = read_raw::<u32>(self.file)?;
-            let mut array = Vec::new();
-            for _ in 0..count {
-                let size = read_raw::<u32>(self.file)?;
-                array.push(read_string(self.file, size as usize)?);
-            }
-            self.current += 1;
-            Ok(Some(array))
+            self.seek()?;
+            let count = read_raw::<u32>(self.file)? as usize;
+            Ok(Some(collect_n(count, || {
+                let size = read_raw::<u32>(self.file)? as usize;
+                read_string(self.file,size)
+            })?))
+        } else {
+            Ok(None)
+        }
+    }
+
+    fn get_event_description(&mut self) -> io::Result<Option<Vec<EventDescription>>> {
+        if self.flags.contains(header_flags::EVENT_DESC) && self.sections.len() > self.current {
+            self.seek()?;
+            let count = read_raw::<u32>(self.file)? as usize;
+            let size = read_raw::<u32>(self.file)? as i64;
+            debug!("read EVENT_DESC: count {}, size {}", count, size);
+            let all_attributes = collect_n(count, ||{
+                let attributes = read_raw::<EventAttributes>(self.file)?;
+                self.file.seek(io::SeekFrom::Current(size - mem::size_of::<EventAttributes>() as i64))?;
+                let id_count = read_raw::<u32>(self.file)? as usize;
+                let name_size = read_raw::<u32>(self.file)?;
+                let name = read_string(self.file, name_size as usize)?;
+                let ids = collect_n(id_count, || read_raw::<u64>(self.file));
+                ids.map(|ids|EventDescription{attributes, name, ids})
+            })?;
+            Ok(Some(all_attributes))
         } else {
             Ok(None)
         }
@@ -511,8 +551,8 @@ impl<'a> HeaderInfoReader<'a> {
 
     fn get<T>(&mut self, flag: HeaderFlags) -> io::Result<Option<T>> {
         if self.flags.contains(flag) && self.sections.len() > self.current {
+            self.seek()?;
             let v = read_raw::<T>(self.file)?;
-            self.current += 1;
             Ok(Some(v))
         } else {
             Ok(None)
@@ -521,6 +561,7 @@ impl<'a> HeaderInfoReader<'a> {
 
     fn skip(&mut self, flag: HeaderFlags) {
         if self.flags.contains(flag) && self.sections.len() > self.current {
+            debug!("Skip section {} {:?}", self.current, flag);
             self.current += 1;
         }
     }
@@ -528,6 +569,20 @@ impl<'a> HeaderInfoReader<'a> {
     fn has_more(&self) -> bool {
         self.sections.len() > self.current
     }
+}
+
+#[repr(C)]
+#[derive(Debug, Serialize)]
+pub struct CpuCount {
+    pub online: u32,
+    pub available: u32
+}
+
+#[derive(Debug, Serialize)]
+pub struct EventDescription {
+    pub attributes: EventAttributes,
+    pub name: String,
+    pub ids: Vec<u64>,
 }
 
 fn read_info(file: &mut File, header: &PerfHeader) -> io::Result<(Info)> {
@@ -538,13 +593,12 @@ fn read_info(file: &mut File, header: &PerfHeader) -> io::Result<(Info)> {
     let os_release = reader.get_string(header_flags::OSRELEASE)?;
     let tools_version = reader.get_string(header_flags::VERSION)?;
     let arch = reader.get_string(header_flags::ARCH)?;
-    reader.skip(header_flags::NRCPUS);
+    let cpu_count = reader.get::<CpuCount>(header_flags::NRCPUS)?;
     let cpu_description = reader.get_string(header_flags::CPUDESC)?;
     let cpu_id = reader.get_string(header_flags::CPUID)?;
     let total_memory = reader.get::<u64>(header_flags::TOTAL_MEM)?;
     let command_line = reader.get_string_array(header_flags::CMDLINE)?;
-    reader.skip(header_flags::EVENT_DESC);
-    //TODO: check is all parsed?
+    let event_description = reader.get_event_description()?;
     let cpu_topology = reader.get_string_array(header_flags::CPU_TOPOLOGY)?;
     reader.skip(header_flags::NUMA_TOPOLOGY);
     reader.skip(header_flags::BRANCH_STACK);
@@ -557,8 +611,8 @@ fn read_info(file: &mut File, header: &PerfHeader) -> io::Result<(Info)> {
         warn!("Unknown flags in header");
     }
 
-    return Ok((Info{hostname: hostname, os_release: os_release, tools_version: tools_version,
-        arch: arch, cpu_id: cpu_id, cpu_description: cpu_description, total_memory: total_memory, command_line: command_line, cpu_topology: cpu_topology}));
+    return Ok((Info{hostname, os_release, tools_version, cpu_count, event_description,
+        arch, cpu_id, cpu_description, total_memory, command_line, cpu_topology}));
 }
 
 pub fn is_perf_file<P: std::convert::AsRef<std::path::Path>>(path: &P) -> Result<(bool)> {
@@ -582,12 +636,15 @@ pub fn read_perf_file_info<P: std::convert::AsRef<std::path::Path>>(path: &P) ->
 
 pub fn read_perf_file<P: std::convert::AsRef<std::path::Path>>(path: &P) -> Result<(Perf)> {
     let mut file = File::open(path)?;
+    debug!("read header");
     let header = read_raw::<PerfHeader>(&mut file)?;
     if header.magic != PERF_FILE_SIGNATURE {
         return Err(ErrorKind::InvalidSinature.into());
     }
+    debug!("header: {:?}\nread info", header);
     let info = read_info(&mut file, &header)?;
         
+    debug!("read attr");
     let attrs = (0..(header.attrs.size / header.attr_size)).map(|i| {
         file.seek(io::SeekFrom::Start(header.attrs.offset + i * header.attr_size))?;
         let attr = read_raw::<EventAttributes>(&mut file)?;
@@ -600,6 +657,9 @@ pub fn read_perf_file<P: std::convert::AsRef<std::path::Path>>(path: &P) -> Resu
     let mut events = Vec::new();
     let mut position = file.seek(io::SeekFrom::Start(header.data.offset))?;
     let mut size = 0;
+    let mut start = std::u64::MAX;
+    let mut end = 0;
+    debug!("read events");
     while size < header.data.size {
         let event_header = read_raw::<EventHeader>(&mut file)?;
         debug!("{:x} {:?}", position, event_header);
@@ -615,7 +675,12 @@ pub fn read_perf_file<P: std::convert::AsRef<std::path::Path>>(path: &P) -> Resu
                 events.push(Event::MMap{pid: part.pid, tid: part.tid, addr:part.addr, pgoff: part.pgoff, len: part.len, filename: filename, sample_id: s});
             },
             RecordType::Sample => {
-                events.push(read_sample(&mut file, &sample_format)?);
+                let sample = read_sample(&mut file, &sample_format)?;
+                if let Event::Sample{time: Some(time), ..} = sample {
+                    start = std::cmp::min(start, time);
+                    end = std::cmp::max(end, time);
+                }
+                events.push(sample);
             },
             RecordType::MMap2 => {
                 let part = read_raw::<MMap2Part>(&mut file)?;
@@ -631,6 +696,8 @@ pub fn read_perf_file<P: std::convert::AsRef<std::path::Path>>(path: &P) -> Resu
                 let part = read_raw::<ExitPart>(&mut file)?;
                 let s = read_sample_id(&mut file, &sample_format)?;
                 events.push(Event::Exit{pid: part.pid, ppid: part.ppid, tid: part.tid, ptid: part.ptid, time: part.time, sample_id: s});
+                start = std::cmp::min(start, part.time);
+                end = std::cmp::max(end, part.time);
             },
             RecordType::Comm => {
                 let part = read_raw::<CommPart>(&mut file)?;
@@ -647,6 +714,6 @@ pub fn read_perf_file<P: std::convert::AsRef<std::path::Path>>(path: &P) -> Resu
         size += event_header.size as u64;
         position = file.seek(io::SeekFrom::Start(header.data.offset + size))?;
     }
-    Ok(Perf{info: info, event_attributes: attrs, events: events})
+    Ok(Perf{info: info, event_attributes: attrs, events: events, start: start, end: end})
 }
 
