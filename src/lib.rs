@@ -31,6 +31,10 @@ use errors::*;
 pub use errors::Error;
 pub use errors::ErrorKind;
 
+macro_rules! ctr {
+    ($name:tt{$($field: tt),*}) => {$name{$($field: $field,)* }
+}}
+
 #[repr(C)]
 #[derive(Debug)]
 struct PerfFileSection {
@@ -541,7 +545,7 @@ impl<'a> HeaderInfoReader<'a> {
                 let name_size = read_raw::<u32>(self.file)?;
                 let name = read_string(self.file, name_size as usize)?;
                 let ids = collect_n(id_count, || read_raw::<u64>(self.file));
-                ids.map(|ids|EventDescription{attributes, name, ids})
+                ids.map(|ids| ctr!(EventDescription{attributes, name, ids}))
             })?;
             Ok(Some(all_attributes))
         } else {
@@ -611,7 +615,7 @@ fn read_info(file: &mut File, header: &PerfHeader) -> io::Result<(Info)> {
         warn!("Unknown flags in header");
     }
 
-    return Ok((Info{hostname, os_release, tools_version, cpu_count, event_description,
+    return Ok(ctr!(Info{hostname, os_release, tools_version, cpu_count, event_description,
         arch, cpu_id, cpu_description, total_memory, command_line, cpu_topology}));
 }
 
