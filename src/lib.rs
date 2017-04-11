@@ -45,6 +45,7 @@ struct PerfFileSection {
 mod header_flags {
     bitflags!{
         pub flags HeaderFlags: u64 {
+            const TRACING_DATA = 1 << 1,
             const BUILD_ID = 1 << 2,
             const HOSTNAME = 1 << 3,
             const OSRELEASE = 1 << 4,
@@ -497,13 +498,13 @@ impl<'a> HeaderInfoReader<'a> {
     fn new(file: &'a mut File, header: &PerfHeader) -> io::Result<Self> {
         file.seek(io::SeekFrom::Start(header.data.offset + header.data.size))?;
         let sections = collect_n(bits_count(header.flags.bits()) as usize, || read_raw::<PerfFileSection>(file))?;
-        debug!("have {} info records, start at 0x{:x}", sections.len(), header.data.offset + header.data.size);
+        debug!("flags: {:x}, have {} info records, start at 0x{:x}",  header.flags.bits(), sections.len(), header.data.offset + header.data.size);
         Ok(HeaderInfoReader{ file: file, sections: sections, current: 0, flags: header.flags })
     }
 
-    fn seek(&mut self) -> io::Result<()> {
+    fn seek(&mut self, flag: HeaderFlags) -> io::Result<()> {
         let section = &self.sections[self.current];
-        debug!("Read section {}, size {}", self.current, section.size);
+        debug!("Read section {} {:?}, size {}", self.current, flag, section.size);
         self.file.seek(io::SeekFrom::Start(section.offset))?;
         self.current += 1;
         Ok(())
@@ -511,7 +512,7 @@ impl<'a> HeaderInfoReader<'a> {
  
     fn get_string(&mut self, flag: HeaderFlags) -> io::Result<Option<String>> {
         if self.flags.contains(flag) && self.sections.len() > self.current {
-            self.seek()?;
+            self.seek(flag)?;
             let size = read_raw::<u32>(self.file)?;
             Ok(Some(read_string(self.file, size as usize)?))
         } else {
@@ -521,7 +522,7 @@ impl<'a> HeaderInfoReader<'a> {
 
     fn get_string_array(&mut self, flag: HeaderFlags) -> io::Result<Option<Vec<String>>> {
         if self.flags.contains(flag) && self.sections.len() > self.current {
-            self.seek()?;
+            self.seek(flag)?;
             let count = read_raw::<u32>(self.file)? as usize;
             Ok(Some(collect_n(count, || {
                 let size = read_raw::<u32>(self.file)? as usize;
@@ -534,7 +535,7 @@ impl<'a> HeaderInfoReader<'a> {
 
     fn get_event_description(&mut self) -> io::Result<Option<Vec<EventDescription>>> {
         if self.flags.contains(header_flags::EVENT_DESC) && self.sections.len() > self.current {
-            self.seek()?;
+            self.seek(header_flags::EVENT_DESC)?;
             let count = read_raw::<u32>(self.file)? as usize;
             let size = read_raw::<u32>(self.file)? as i64;
             debug!("read EVENT_DESC: count {}, size {}", count, size);
@@ -555,7 +556,7 @@ impl<'a> HeaderInfoReader<'a> {
 
     fn get<T>(&mut self, flag: HeaderFlags) -> io::Result<Option<T>> {
         if self.flags.contains(flag) && self.sections.len() > self.current {
-            self.seek()?;
+            self.seek(flag)?;
             let v = read_raw::<T>(self.file)?;
             Ok(Some(v))
         } else {
@@ -565,7 +566,7 @@ impl<'a> HeaderInfoReader<'a> {
 
     fn skip(&mut self, flag: HeaderFlags) {
         if self.flags.contains(flag) && self.sections.len() > self.current {
-            debug!("Skip section {} {:?}", self.current, flag);
+            debug!("Skip section {} {:?} size {}", self.current, flag, self.sections[self.current].size);
             self.current += 1;
         }
     }
@@ -592,6 +593,7 @@ pub struct EventDescription {
 fn read_info(file: &mut File, header: &PerfHeader) -> io::Result<(Info)> {
     let mut reader = HeaderInfoReader::new(file, header)?;
     
+    reader.skip(header_flags::TRACING_DATA);
     reader.skip(header_flags::BUILD_ID);
     let hostname = reader.get_string(header_flags::HOSTNAME)?;
     let os_release = reader.get_string(header_flags::OSRELEASE)?;
