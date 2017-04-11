@@ -22,7 +22,12 @@ mod errors {
             InvalidSinature {
                 description("invalid perf file signature")
                 display("invalid perf file signature")
-        } }
+            }
+            DifferentSampleFormat {
+                description("different sample format")
+                display("different sample format")
+            }
+        }
     }
 }
 
@@ -658,6 +663,11 @@ pub fn read_perf_file<P: std::convert::AsRef<std::path::Path>>(path: &P) -> Resu
     }).collect::<Result<Vec<_>>>()?;
     
     let sample_format = attrs[0].sample_format;
+    if !attrs.iter().map(|x| x.sample_format).all(|x| x == sample_format) {
+        error!("different sample formats");
+        return Err(ErrorKind::DifferentSampleFormat.into());
+    }
+
     let sample_size = sample_id_size(&sample_format);
         
     let mut events = Vec::new();
