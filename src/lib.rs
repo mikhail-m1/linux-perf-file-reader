@@ -202,10 +202,10 @@ pub mod read_format {
 pub struct EventAttributes {
 	pub perf_type: PerfType, //Major type: hardware/software/tracepoint/etc.
 	pub size: u32,
-	pub hw_id: HwId,
+	pub config: u64, //TODO: HwId for type hardware,
 	pub sample_period_or_freq: u64,
 	pub sample_format: sample_format::SampleFormat,
-	pub read_format: /*u64, */read_format::ReadFormat,
+	pub read_format: read_format::ReadFormat,
 	pub flags: attr_flags::AttrFlags,
 	pub wakeup_events_or_watermakr: u32, /* wakeup every n events or bytes before wakeup   */
 	pub bp_type: u32,
