@@ -36,9 +36,13 @@ mod errors {
                 description("invalid perf file signature")
                 display("invalid perf file signature")
             }
-            DifferentSampleFormat {
-                description("different sample format")
-                display("different sample format")
+            NoEventInInfoSection {
+                description("cannot read dump without event info")
+                display("cannot read dump without event info")
+            }
+            NoIndentifierInEventInInfoAttributes {
+                description("cannot read dump without IDENTIFIER flag and different sample format")
+                display("cannot read dump without IDENTIFIER flag and different sample format")
             }
         }
     }
@@ -207,7 +211,7 @@ pub struct Info {
     pub total_memory: Option<u64>,
     pub command_line: Option<Vec<String>>,
     pub cpu_topology: Option<Vec<String>>,
-    pub event_description: Option<Vec<EventDescription>>,
+    pub event_descriptions: Option<Vec<EventDescription>>,
     // TODO add others
 }
 
@@ -335,6 +339,10 @@ pub fn read_perf_file<P: std::convert::AsRef<std::path::Path>>(path: &P) -> Resu
              })
         .collect::<Result<Vec<_>>>()?;
 
-    let (events, start, end) = event_reader::read_events(&mut file, &header, &event_attributes)?;
-    Ok(ctr!(Perf{info, event_attributes, events, start, end,}))
+    if info.event_descriptions.is_none() {
+        Err(ErrorKind::NoEventInInfoSection.into())
+    } else {
+        let (events, start, end) = event_reader::read_events(&mut file, &header, &info.event_descriptions.as_ref().unwrap())?;
+        Ok(ctr!(Perf{info, event_attributes, events, start, end,}))
+    }
 }

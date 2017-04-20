@@ -1,6 +1,7 @@
 use ::*;
-use tools::{read_raw, read_string};
+use tools::{read_raw, read_string, collect_n};
 use std::io::{Read, Seek};
+use std::collections::HashMap; 
 
 #[repr(u32)]
 #[derive(Debug)]
@@ -89,72 +90,101 @@ macro_rules! bool_to_option {
     }
 }
 
-fn sample_id_size(s: &sample_format::SampleFormat) -> usize {
-    let mut size = 0;
-    if s.contains(sample_format::TID) {
-        size += 8;
-    }
-    if s.contains(sample_format::TIME) {
-        size += 8;
-    }
-    if s.contains(sample_format::ID) {
-        size += 8;
-    }
-    if s.contains(sample_format::STREAM_ID) {
-        size += 8;
-    }
-    if s.contains(sample_format::CPU) {
-        size += 8;
-    }
-    if s.contains(sample_format::IDENTIFIER) {
-        size += 8;
-    }
-    size
+struct SampleReader{
+    id_to_sample_format: HashMap<u64, sample_format::SampleFormat>,
+    sample_id_format: sample_format::SampleFormat,
+    sample_id_size: usize,
 }
 
-fn read_sample_id(file: &mut Read, s: &sample_format::SampleFormat) -> io::Result<SampleId> {
-    let pid = bool_to_option!(s.contains(sample_format::TID), read_raw(file)?);
-    let tid = bool_to_option!(s.contains(sample_format::TID), read_raw(file)?);
-    let time = bool_to_option!(s.contains(sample_format::TIME), read_raw(file)?);
-    let id = bool_to_option!(s.contains(sample_format::ID), read_raw(file)?);
-    let stream_id = bool_to_option!(s.contains(sample_format::STREAM_ID), read_raw(file)?);
-    let cpu = bool_to_option!(s.contains(sample_format::CPU), read_raw(file)?);
-    let res = bool_to_option!(s.contains(sample_format::CPU), read_raw(file)?);
-    let identifier = bool_to_option!(s.contains(sample_format::IDENTIFIER), read_raw(file)?);
-    Ok(ctr!(SampleId{pid, tid, time, id, stream_id, cpu, res, identifier}))
-}
+impl SampleReader {
+    fn new(event_desciptions: &[EventDescription]) -> Result<Self> {
+        if event_desciptions.len() == 0 {
+            Err(ErrorKind::NoEventInInfoSection.into())
+        } else if event_desciptions.len() > 1 && 
+                  !event_desciptions.iter().all(|d| d.attributes.sample_format.contains(sample_format::IDENTIFIER)) &&
+                  !event_desciptions.iter().all(|d| d.attributes.sample_format == event_desciptions[0].attributes.sample_format) {
+            Err(ErrorKind::NoIndentifierInEventInInfoAttributes.into())
+        } else {
+            let first = event_desciptions[0].attributes.sample_format;
+            let map = event_desciptions.iter().flat_map(|d| d.ids.iter().map(move|id| (*id, d.attributes.sample_format) )).collect();
+            Ok(SampleReader{
+                id_to_sample_format: map,
+                sample_id_format: first,
+                sample_id_size: Self::sample_id_size(&first),
+            })
+        }
+    }
 
-fn read_sample(file: &mut Read, s: &sample_format::SampleFormat) -> io::Result<Event> {
-    let identifier = bool_to_option!(s.contains(sample_format::IDENTIFIER), read_raw(file)?);
-    let ip = bool_to_option!(s.contains(sample_format::IP), read_raw(file)?);
-    let pid = bool_to_option!(s.contains(sample_format::TID), read_raw(file)?);
-    let tid = bool_to_option!(s.contains(sample_format::TID), read_raw(file)?);
-    let time = bool_to_option!(s.contains(sample_format::TIME), read_raw(file)?);
-    let addr = bool_to_option!(s.contains(sample_format::ADDR), read_raw(file)?);
-    let id = bool_to_option!(s.contains(sample_format::ID), read_raw(file)?);
-    let stream_id = bool_to_option!(s.contains(sample_format::STREAM_ID), read_raw(file)?);
-    let cpu = bool_to_option!(s.contains(sample_format::CPU), read_raw(file)?);
-    let res = bool_to_option!(s.contains(sample_format::CPU), read_raw(file)?);
-    let period = bool_to_option!(s.contains(sample_format::PERIOD), read_raw(file)?);
-    let call_chain = vec![];// TODO support stacks
-    use Event::Sample;
-    Ok(ctr!(Sample{identifier, ip, pid, tid, time, addr, id, stream_id, cpu, res, period, call_chain}))
+    fn sample_id_size(s: &sample_format::SampleFormat) -> usize {
+        let mut size = 0;
+        if s.contains(sample_format::TID) {
+            size += 8;
+        }
+        if s.contains(sample_format::TIME) {
+            size += 8;
+        }
+        if s.contains(sample_format::ID) {
+            size += 8;
+        }
+        if s.contains(sample_format::STREAM_ID) {
+            size += 8;
+        }
+        if s.contains(sample_format::CPU) {
+            size += 8;
+        }
+        if s.contains(sample_format::IDENTIFIER) {
+            size += 8;
+        }
+        size
+    }
+
+    fn read_sample_id(&self, file: &mut Read) -> io::Result<SampleId> {
+        let s = self.sample_id_format;
+        let pid = bool_to_option!(s.contains(sample_format::TID), read_raw(file)?);
+        let tid = bool_to_option!(s.contains(sample_format::TID), read_raw(file)?);
+        let time = bool_to_option!(s.contains(sample_format::TIME), read_raw(file)?);
+        let id = bool_to_option!(s.contains(sample_format::ID), read_raw(file)?);
+        let stream_id = bool_to_option!(s.contains(sample_format::STREAM_ID), read_raw(file)?);
+        let cpu = bool_to_option!(s.contains(sample_format::CPU), read_raw(file)?);
+        let res = bool_to_option!(s.contains(sample_format::CPU), read_raw(file)?);
+        let identifier = bool_to_option!(s.contains(sample_format::IDENTIFIER), read_raw(file)?);
+        Ok(ctr!(SampleId{pid, tid, time, id, stream_id, cpu, res, identifier}))
+    }
+
+    fn read_sample(&self, file: &mut Read) -> io::Result<Event> {
+        let mut s = self.sample_id_format;
+        let identifier = bool_to_option!(s.contains(sample_format::IDENTIFIER), read_raw(file)?);
+        if let Some(id) = identifier.as_ref() {
+            if let Some(actual_format) = self.id_to_sample_format.get(id) {
+                s = *actual_format;
+            }
+        }
+        let ip = bool_to_option!(s.contains(sample_format::IP), read_raw(file)?);
+        let pid = bool_to_option!(s.contains(sample_format::TID), read_raw(file)?);
+        let tid = bool_to_option!(s.contains(sample_format::TID), read_raw(file)?);
+        let time = bool_to_option!(s.contains(sample_format::TIME), read_raw(file)?);
+        let addr = bool_to_option!(s.contains(sample_format::ADDR), read_raw(file)?);
+        let id = bool_to_option!(s.contains(sample_format::ID), read_raw(file)?);
+        let stream_id = bool_to_option!(s.contains(sample_format::STREAM_ID), read_raw(file)?);
+        let cpu = bool_to_option!(s.contains(sample_format::CPU), read_raw(file)?);
+        let res = bool_to_option!(s.contains(sample_format::CPU), read_raw(file)?);
+        let period = bool_to_option!(s.contains(sample_format::PERIOD), read_raw(file)?);
+        let call_chain = if !s.contains(sample_format::CALLCHAIN) {
+            vec![]
+        } else {
+            collect_n(read_raw::<u64>(file)? as usize, || read_raw::<u64>(file))?
+        };
+        use Event::Sample;
+        Ok(ctr!(Sample{identifier, ip, pid, tid, time, addr, id, stream_id, cpu, res, period, call_chain}))
+    }
 }
 
 pub fn read_events(file: &mut File,
                    header: &PerfHeader,
-                   attrs: &[EventAttributes])
+                   event_desciptions: &[EventDescription])
                    -> Result<(Vec<Event>, u64, u64)> {
-    let sample_format = attrs[0].sample_format;
-    if !attrs
-            .iter()
-            .map(|x| x.sample_format)
-            .all(|x| x == sample_format) {
-        error!("different sample formats");
-        return Err(ErrorKind::DifferentSampleFormat.into());
-    }
 
-    let sample_size = sample_id_size(&sample_format);
+    let sample_reader = SampleReader::new(event_desciptions)?;
 
     let mut events = Vec::new();
     let mut position = file.seek(io::SeekFrom::Start(header.data.offset))?;
@@ -171,9 +201,8 @@ pub fn read_events(file: &mut File,
                 let part = read_raw::<MMapPart>(file)?;
                 let filename = read_string(file,
                                            event_header.size as usize - mem::size_of::<MMapPart>() -
-                                           mem::size_of::<EventHeader>() -
-                                           sample_size)?;
-                let s = read_sample_id(file, &sample_format)?;
+                                           mem::size_of::<EventHeader>() - sample_reader.sample_id_size)?;
+                let s = sample_reader.read_sample_id(file)?;
                 events.push(Event::MMap {
                                 pid: part.pid,
                                 tid: part.tid,
@@ -185,7 +214,7 @@ pub fn read_events(file: &mut File,
                             });
             }
             RecordType::Sample => {
-                let sample = read_sample(file, &sample_format)?;
+                let sample = sample_reader.read_sample(file)?;
                 if let Event::Sample { time: Some(time), .. } = sample {
                     start = std::cmp::min(start, time);
                     end = std::cmp::max(end, time);
@@ -195,11 +224,9 @@ pub fn read_events(file: &mut File,
             RecordType::MMap2 => {
                 let part = read_raw::<MMap2Part>(file)?;
                 let filename = read_string(file,
-                                           event_header.size as usize -
-                                           mem::size_of::<MMap2Part>() -
-                                           mem::size_of::<EventHeader>() -
-                                           sample_size)?;
-                let s = read_sample_id(file, &sample_format)?;
+                                           event_header.size as usize - mem::size_of::<MMap2Part>() -
+                                           mem::size_of::<EventHeader>() - sample_reader.sample_id_size)?;
+                let s = sample_reader.read_sample_id(file)?;
                 events.push(Event::MMap2 {
                                 pid: part.pid,
                                 tid: part.tid,
@@ -218,7 +245,7 @@ pub fn read_events(file: &mut File,
             }
             RecordType::Exit => {
                 let part = read_raw::<ExitPart>(file)?;
-                let s = read_sample_id(file, &sample_format)?;
+                let s = sample_reader.read_sample_id(file)?;
                 events.push(Event::Exit {
                                 pid: part.pid,
                                 ppid: part.ppid,
@@ -235,8 +262,8 @@ pub fn read_events(file: &mut File,
                 let comm = read_string(file,
                                        event_header.size as usize - mem::size_of::<CommPart>() -
                                        mem::size_of::<EventHeader>() -
-                                       sample_size)?;
-                let s = read_sample_id(file, &sample_format)?;
+                                       sample_reader.sample_id_size)?;
+                let s = sample_reader.read_sample_id(file)?;
                 events.push(Event::Comm {
                                 pid: part.pid,
                                 tid: part.tid,

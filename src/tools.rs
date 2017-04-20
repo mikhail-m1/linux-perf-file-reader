@@ -1,4 +1,4 @@
-use std::{mem, io, slice};
+use std::{mem, io, slice, result};
 use std::io::Read;
 
 pub fn read_raw<T>(file: &mut Read) -> io::Result<T> {
@@ -19,3 +19,14 @@ pub fn read_string(file: &mut Read, size: usize) -> io::Result<String> {
     //debug!("read str max size:{}, result: {}, `{}`", size, s.len(), s);
     Ok(s)
 }
+
+pub fn collect_n<T, E, F>(count: usize, mut function: F) -> result::Result<Vec<T>, E>
+    where F: FnMut() -> result::Result<T, E>
+{
+    let mut v = Vec::with_capacity(count);
+    for _ in 0..count {
+        v.push(function()?);
+    }
+    Ok(v)
+}
+

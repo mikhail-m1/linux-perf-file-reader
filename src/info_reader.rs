@@ -1,6 +1,6 @@
 use ::*;
 use header::*;
-use tools::{read_raw, read_string};
+use tools::{collect_n, read_raw, read_string};
 
 pub fn read_info(file: &mut File, header: &PerfHeader) -> io::Result<(Info)> {
     let mut reader = HeaderInfoReader::new(file, header)?;
@@ -16,7 +16,7 @@ pub fn read_info(file: &mut File, header: &PerfHeader) -> io::Result<(Info)> {
     let cpu_id = reader.get_string(header_flags::CPUID)?;
     let total_memory = reader.get::<u64>(header_flags::TOTAL_MEM)?;
     let command_line = reader.get_string_array(header_flags::CMDLINE)?;
-    let event_description = reader.get_event_description()?;
+    let event_descriptions = reader.get_event_description()?;
     let cpu_topology = reader.get_string_array(header_flags::CPU_TOPOLOGY)?;
     reader.skip(header_flags::NUMA_TOPOLOGY);
     reader.skip(header_flags::BRANCH_STACK);
@@ -34,7 +34,7 @@ pub fn read_info(file: &mut File, header: &PerfHeader) -> io::Result<(Info)> {
         os_release,
         tools_version,
         cpu_count,
-        event_description,
+        event_descriptions,
         arch,
         cpu_id,
         cpu_description,
@@ -49,16 +49,6 @@ struct HeaderInfoReader<'a> {
     sections: Vec<PerfFileSection>,
     current: usize,
     flags: HeaderFlags,
-}
-
-fn collect_n<T, E, F>(count: usize, mut function: F) -> std::result::Result<Vec<T>, E>
-    where F: FnMut() -> std::result::Result<T, E>
-{
-    let mut v = Vec::with_capacity(count);
-    for _ in 0..count {
-        v.push(function()?);
-    }
-    Ok(v)
 }
 
 fn bits_count(mut v: u64) -> u8 {

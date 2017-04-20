@@ -36,7 +36,7 @@ fn main() {
             println!("Info:");
             print_if_some_child!(" {}: {}\n", perf.info, hostname, os_release, tools_version, arch, cpu_description, cpu_id, total_memory);
             print_if_some_child!(" {}: {:?}\n", perf.info, command_line, cpu_topology, cpu_count);
-            if let Some(ref event_description) = perf.info.event_description {
+            if let Some(ref event_description) = perf.info.event_descriptions {
                 for d in event_description {
                     println!(" event_attribute {}{:?}: {:?}", d.name, d.ids, d.attributes);
                 }
@@ -72,7 +72,10 @@ fn main() {
                         print_if_some!(" {}: {}", pid, tid, time, id, identifier, stream_id, cpu, res, period);
                         println!("");
                         if !call_chain.is_empty() {
-                            println!("  call chain: {:?}", call_chain);
+                            println!("  call chain: ");
+                            for addr in call_chain.iter() {
+                                println!("    {:x}", addr);
+                            }
                         }
                     },
                     &Event::FinishedRound => {}
