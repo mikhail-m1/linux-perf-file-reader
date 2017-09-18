@@ -5,7 +5,7 @@ pub fn read_raw<T>(file: &mut Read) -> io::Result<T> {
     let size = mem::size_of::<T>();
     unsafe {
         let mut t: T = mem::uninitialized();
-        let mut slice = slice::from_raw_parts_mut(mem::transmute(&mut t), size);
+        let slice = slice::from_raw_parts_mut(mem::transmute(&mut t), size);
         file.read_exact(slice)?;
         Ok(t)
     }

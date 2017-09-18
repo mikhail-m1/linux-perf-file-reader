@@ -10,7 +10,7 @@ license = "GPL-3.0"
 
 [dependencies]
 bitflags = "0.8"
-error-chain = "0.10"
+error-chain = "0.11"
 serde = "0.9"
 serde_derive = "0.9"
 log = "0.3"
