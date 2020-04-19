@@ -1,19 +1,20 @@
 [package]
 name = "linux-perf-file-reader"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Mikhail Modin <mikhailm1@gmail.com>"]
 description = "Library for parse perf.data file from Linux perf tool"
 homepage = "https://github.com/mikhail-m1/linux-perf-file-reader"
 repository = "https://github.com/mikhail-m1/linux-perf-file-reader"
 readme = "README.md"
 license = "GPL-3.0"
+edition = "2018"
 
 [dependencies]
-bitflags = "0.8"
-error-chain = "0.11"
-serde = "0.9"
-serde_derive = "0.9"
-log = "0.3"
+bitflags = "1.2"
+error-chain = "0.12.2"
+serde = "1.0"
+serde_derive = "1.0"
+log = "0.4"
 
 [dev-dependencies]
-env_logger ="0.4"
+env_logger ="0.7"
